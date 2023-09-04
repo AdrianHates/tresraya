@@ -1,25 +1,64 @@
+
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  background-color: var(--c-verde-esmeralda);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  --c-negro: black;
+  --c-transparent: transparent;
+  --c-naranja: orange;
+  --c-rojo: red;
+  --c-rojo-boton: #E2211C;
+  --c-celeste: skyblue;
+  --c-azul: blue;
+  --c-amarillo: yellow;
+  --c-green: green;
+  --c-mainHigh: #1d1d1d;
+  --c-mainMedium: #313131;
+  --c-mainLow: #404040;
+  --c-dorado: #efb810;
+  --c-dorado-button: #febe10;
+  --c-Paypal: #ffc439;
+  --c-gris-1: #bdbdbd;
+  --c-blanco: white;
+  --c-blanco-suave: #F7F7F7;
+  --c-naranja1: #fda085;
+  --c-dorado-fino: #dd9933;
+  --gradiente1: linear-gradient(to right, #f6d365, #fda085);
+  --family-like: 'Montserrat';
+  --c-negro-navegador-letter: #333;
+  --c-negro-landing-page: #121215;
+  --c-negro-landing-page-0: #17171b;
+  --c-azul-facebook: #3b5998;
+  --c-azul-linkedin: rgb(0, 125, 189);
+  --c-verde-esmeralda: #009975;
+  --c-azul-michi: #012364;
+  --c-celest-selection: #b3d4fc;
 }
 
 body {
   margin: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
   min-width: 320px;
   min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 * {
@@ -28,10 +67,27 @@ body {
   box-sizing: border-box;
 }
 
+.juega-ahora {
+  padding: 1rem;
+  background-color: var(--c-azul-linkedin);
+  color: var(--c-blanco);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 3px;
+  border-radius: 2rem;
+  border: none;
+  box-shadow: 0px 1px 1px 1px var(--c-negro-landing-page);
+}
+
 .tablero {
   width: fit-content;
   margin: 40px auto;
+  width: 100%;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 
 .tablero h1 {  
@@ -46,8 +102,8 @@ body {
 }
 
 .cuadrado {
-  width: 100px;
-  height: 100px;
+  width: 70px;
+  height: 70px;
   border: 2px solid #eee;
   border-radius: 5px;
   display: grid;
@@ -57,26 +113,63 @@ body {
   font-size: 48px;
 }
 
-.turno {
+.contenedor {
   display: flex;
-  justify-content: center;
+  align-items: center;
   margin: 15px auto;
-  width: fit-content;
   position: relative;
+  justify-content: center;
+  gap: 2rem;
   border-radius: 10px;
+  width: 100%;
+  & > div {
+      border-radius: 7.5%;
+      padding: 5px;
+      background: var(--c-azul-michi);
+      & > div {
+        border-radius: 5%;
+        background-color: white;
+        padding: 5px;
+        position: relative;
+        
+        & > .cuadrado {
+          background: var(--c-azul-michi);
+          
+        }
+        & > .cuadrado.selected {
+          &::before {
+            width: 100%;
+            content: attr(data);
+            position: absolute;
+            bottom: -100px;
+            left: 0;
+            font-size: 30px;        
+            
+          }
+        }
+        & > div:nth-of-type(1) {
+          color: var(--c-celest-selection);
+        }
+        & > div:nth-of-type(2) {
+          color: var(--c-azul-michi);
+        }
+      }
+  }
+      
 }
 
-.turno .cuadrado,
 .ganador .cuadrado {
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 100%;
   pointer-events: none;
   border-color: transparent;
+
 }
 
 .cuadrado.selected {
   color: #fff;
   background: #efb810;
+
 }
 
 .ganador {
@@ -123,4 +216,17 @@ body {
   transition: 0.2s;
   font-weight: bold;
   cursor: pointer;
+}
+
+@keyframes blink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+.cuadrado.selected::before {
+  animation: blink 1s infinite; 
 }

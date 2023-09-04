@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import confetti from 'canvas-confetti'
 
 const TURNOS = {
@@ -6,14 +6,14 @@ const TURNOS = {
   O: 'O'
 }
 
-const Cuadrado =  ( { children, isSelected, actualizarTablero, index } ) => {
+const Cuadrado =  ( { children, isSelected, actualizarTablero, index, data } ) => {
   const className = `cuadrado ${isSelected ? 'selected' : ''}`
 
   const handleClick = () => {
     actualizarTablero(index)
   }
   return (
-    <div onClick={handleClick} className={className}>
+    <div onClick={handleClick} className={className} data={data} >
       {children}
     </div>
   )
@@ -35,7 +35,8 @@ function App() {
   const [tablero, setTablero] = useState(Array(9).fill(null));
   const [turno, setTurno] = useState(TURNOS.X)
   const [ganador, setGanador] = useState(null)
-
+  const [inicio, setInicio] = useState(true)
+  
   const reiniciarJuego = () => {
     setTablero(Array(9).fill(null))
     setTurno(TURNOS.X)
@@ -63,10 +64,26 @@ function App() {
   const actualizarTablero = (index) => {
     if(tablero[index] || ganador) return
     const newTablero = [...tablero]
-    newTablero[index] = turno
+    
+    switch (turno) {
+      case TURNOS.X:
+        newTablero[index] = turno
+        break
+      case TURNOS.O: {
+        const filtrarIndices = []
+        newTablero.forEach( (unidad,index) => {
+          if(unidad === null) {
+            filtrarIndices.push(index)
+          }
+        })
+        const indiceAleatorio = Math.floor(Math.random()*filtrarIndices.length)
+        newTablero[filtrarIndices[indiceAleatorio]] = turno
+      }
+    }
     setTablero(newTablero)
     const newTurno = turno===TURNOS.X ? TURNOS.O : TURNOS.X
     setTurno(newTurno)
+    
     //revisar ganador
     const nuevoGanador = verificarGanador(newTablero)
     if(nuevoGanador) {
@@ -77,27 +94,56 @@ function App() {
     }
   }
 
+  function Computer () {
+    actualizarTablero()
+  }
+
+  function jugarTresRaya() {
+    setInicio(false)
+  }
+  useEffect(() => {
+    if(turno === TURNOS.O && !tablero.every(x=>x===null)) {
+      setTimeout(() => {
+        Computer()
+      }, 2000);
+      
+    }
+  }, [turno])
   return (
+    <>{inicio?(<button className='juega-ahora' onClick={jugarTresRaya}>Juega Ahora</button>):
+    
     <main className='tablero'>
       <h1>Tres en raya</h1>
       <button onClick={reiniciarJuego}>Reiniciar partida</button>
-      <section className='juego'>
-        {tablero.map((cuadrado,index)=>{
-          return(
-            <Cuadrado 
-            key={index}
-            index={index}
-            actualizarTablero={actualizarTablero}
-            >
-              {cuadrado}
-            </Cuadrado>
-          )
-        })}
-      </section>
-      <section className='turno'>
-        <Cuadrado isSelected={turno===TURNOS.X}>{TURNOS.X}</Cuadrado>
-        <Cuadrado isSelected={turno===TURNOS.O}>{TURNOS.O}</Cuadrado>
-      </section>
+      <div className='contenedor'>
+        <div>
+          <div>
+            <Cuadrado isSelected={turno===TURNOS.X} data={turno===TURNOS.X?'You Turn':''}>{TURNOS.X}</Cuadrado>
+            
+            <div>Player 1</div>
+          </div>
+        </div>
+        <section className='juego'>
+          {tablero.map((cuadrado,index)=>{
+            return(
+              <Cuadrado 
+              key={index}
+              index={index}
+              actualizarTablero={turno===TURNOS.X?actualizarTablero:()=>{}}
+              >
+                {cuadrado}
+              </Cuadrado>
+            )
+          })}
+        </section>
+        <div>
+          <div>
+            <Cuadrado isSelected={turno===TURNOS.O} data={turno===TURNOS.O?'Thinking':''}>{TURNOS.O}</Cuadrado>
+            <div>Computer</div>
+          </div>
+          
+        </div>
+      </div>
       {
         ganador !== null && (
           <section className='ganador'>
@@ -118,6 +164,9 @@ function App() {
         )
       }
     </main>
+    
+  
+    }</>
   )
 }
 
